@@ -3,11 +3,12 @@ package redis
 import (
 	"cart-service/golang/internal/models"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"sync"
 	"time"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -55,13 +56,13 @@ func GetCartFromRedis(id string) (*models.Cart, error) {
 
 	res, err := client.Get(ctx, getCartKey(id)).Bytes()
 	if err == redis.Nil {
-		return &models.Cart{}, nil
+		return nil, nil
 	} else if err != nil {
 		return nil, err
 	}
 
 	var cart models.Cart
-	if err := json.Unmarshal(res, &cart); err != nil {
+	if err := sonic.Unmarshal(res, &cart); err != nil {
 		return nil, err
 	}
 
@@ -71,7 +72,7 @@ func GetCartFromRedis(id string) (*models.Cart, error) {
 func SaveToCart(id string, cart *models.Cart) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
-	jsonCart, err := json.Marshal(cart)
+	jsonCart, err := sonic.Marshal(cart)
 	if err != nil {
 		return err
 	}
