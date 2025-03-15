@@ -1,0 +1,26 @@
+services:
+  cart-service:
+    build:
+      context: ./src/cart-service
+      dockerfile: Dockerfile
+    ports:
+      - ${CART_PORT}
+    env_file:
+      - src/cart-service/.env
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7.2
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  redis_data:
