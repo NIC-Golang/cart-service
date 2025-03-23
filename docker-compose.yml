@@ -1,12 +1,12 @@
 services:
   cart-service:
     build:
-      context: ./src/cart-service
+      context: .
       dockerfile: Dockerfile
     ports:
       - ${CART_PORT}
     env_file:
-      - src/cart-service/.env
+      - ./.env
     depends_on:
       - redis
 
